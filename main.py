@@ -9,10 +9,15 @@ import numpy as np
 from tqdm import tqdm
 from deepface import DeepFace
 
+from flask import Flask, request, jsonify
+import json
+
 from Functions.ConvertVideo import ConvertVideo
 from Functions.AwsServices import AwsServices
 from Functions.SaveFile import SaveFile
 from Functions.Transcription import Transcription
+
+app = Flask(__name__)
 
 def CarregarBancoImagens():
     bancoImagens = f"Arquivos\\BancoImagens"
@@ -135,16 +140,31 @@ def AnalisarInformacoesVideo(video, audio, arquivoTranscricao, arquivoSentimento
     sentimento = analiseSentimento.SentimentAnalyzer(arquivoTranscricao, comprehend)
 
     salvarTexto.SaveTextFile(arquivoSentimento, sentimento)
+
+@app.route("/upload", methods=["POST"])    
+def carregarArquivo():
+    if 'file' not in request.files:
+        return jsonify({"error": "Arquivo não enviado"}), 400
+
+    file = request.files.get('file')
+    if file.filename == '':
+        return jsonify({"error": "Arquivo não selecionado"}), 400
     
+    if file.filename.endswith('.mp4'):
+        file.save("Arquivos\\Video\\" + file.filename)
+        video = f"Arquivos\\Video\\"  + file.filename
+        videoReconhecimento = f"Arquivos\\Video\\VideoReconhecimento.mp4"
+        audio = f"Arquivos\\Audio\\audio.mp3"
+        arquivoTranscricao = f"Arquivos\\Texto\\transcricao.txt"
+        arquivoSentimento = f"Arquivos\\Texto\\sentimento.txt"
+
+        DetectarFaceEmocoes(video, videoReconhecimento)
+        AnalisarInformacoesVideo(video, audio, arquivoTranscricao, arquivoSentimento)
+
+        return jsonify({"success": "Arquivo carregado com sucesso"}), 200
+    else:
+        return jsonify({"error": "Erro de Encoding"}), 400
 
 if __name__ == "__main__":
-
-    video = f"Arquivos\\Video\\Video.mp4"
-    videoReconhecimento = f"Arquivos\\Video\\VideoReconhecimento.mp4"
-    audio = f"Arquivos\\Audio\\audio.mp3"
-    arquivoTranscricao = f"Arquivos\\Texto\\transcricao.txt"
-    arquivoSentimento = f"Arquivos\\Texto\\sentimento.txt"
-
-    DetectarFaceEmocoes(video, videoReconhecimento)
-    AnalisarInformacoesVideo(video, audio, arquivoTranscricao, arquivoSentimento)
+    app.run(host='0.0.0.0', port=5000)  
   
