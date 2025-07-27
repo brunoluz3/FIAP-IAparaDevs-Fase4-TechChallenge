@@ -1,3 +1,14 @@
+"""
+Autores: Bruno Luz e Diogo Leal
+Conteúdo do trabalho de encerramento da quarta fase do curso de IA para Devs
+Esse codigo tem como objetivos a aplicacao pratica de algoritmos de reconhecimento facial, uso da OpenAI e do Comprehend da AWS
+
+Case:
+    Analise da entrevista do João Gordo para o pod cast Inteligencia LTDA, onde ele conta uma história sobre a relação dele com o Chorão, 
+    o nosso proposito é utilizar o reconhecimento facil para identificar as pessoas do video e suas emoções ao longo da conversa
+    além disso, fizemos uma transcricao utilizando a OpenAI e por fim, a analise de sentimento com o comprehend
+"""
+
 from dotenv import load_dotenv
 from openai import OpenAI
 import boto3

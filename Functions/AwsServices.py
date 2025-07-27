@@ -8,7 +8,7 @@ class AwsServices:
             text = file.read()
 
         sentiment_response = aws_comprehend.detect_sentiment(
-            Text = text,
+            Text = text[:4000],
             LanguageCode="pt"
         )
 
